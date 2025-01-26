@@ -14,6 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ContactListAdapter: ListAdapter<Contact, ContactListAdapter.ContactViewHolder>(ContactDiffUtils()) {
 
+    private lateinit var onClickListener: (Contact) -> Unit
+
+
+
     //Criar um view holder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list, parent, false)
@@ -22,19 +26,28 @@ class ContactListAdapter: ListAdapter<Contact, ContactListAdapter.ContactViewHol
     // bind - atrelar o dado com a UI views
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = getItem(position)
-        holder.bind(contact)
+        holder.bind(contact, onClickListener)
+    }
+
+    fun setOnClickListener(onClick: (Contact) -> Unit){
+        onClickListener = onClick
+
     }
 
     // view holder = view que segura os dados
-    class ContactViewHolder(view: View) : RecyclerView.ViewHolder(view){
+    class ContactViewHolder(private val view: View) : RecyclerView.ViewHolder(view){
         private val tvName = view.findViewById<TextView>(R.id.tv_name)
         private val tvNumber = view.findViewById<TextView>(R.id.tv_number)
         private val image_view = view.findViewById<ImageView>(R.id.img_vw)
 
-        fun bind(contact: Contact){
+        fun bind(contact: Contact, onClick: (Contact) -> Unit){
             tvName.text = contact.name
             tvNumber.text = contact.number
             image_view.setImageResource(contact.icon)
+
+            view.setOnClickListener{
+                onClick.invoke(contact)
+            }
         }
     }
     // compara a diferença quando a nossa lista é atualizada
